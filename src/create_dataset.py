@@ -18,6 +18,7 @@ def parse_args():
 
 
 def main(args):
+    os.makedirs(args.data_dir, exist_ok=True)
     dataset: DatasetDict = load_dataset("trec")
     x = np.array(dataset["train"]["text"], dtype=object)
     y = np.array(dataset["train"]["coarse_label"], dtype=np.int8)
