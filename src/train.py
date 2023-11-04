@@ -20,10 +20,10 @@ def main():
         train_ds, batch_size=32, shuffle=True, collate_fn=PadSequence()
     )
     dev_loader = DataLoader(
-        dev_ds, batch_size=32, shuffle=True, collate_fn=PadSequence()
+        dev_ds, batch_size=32, shuffle=False, collate_fn=PadSequence()
     )
     test_loader = DataLoader(
-        test_ds, batch_size=32, shuffle=True, collate_fn=PadSequence()
+        test_ds, batch_size=32, shuffle=False, collate_fn=PadSequence()
     )
 
     model = BiLSTM(torch.from_numpy(w2v.vectors), n_classes=6)
