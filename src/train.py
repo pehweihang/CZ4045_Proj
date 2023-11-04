@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 import gensim.downloader
 import hydra
@@ -63,8 +63,10 @@ def main(cfg: DictConfig):
 
     for epoch in range(cfg.epochs):
         model.train()
-        loss = 0
-        accuracy = 0
+        train_loss = 0
+        train_corrects = 0
+        dev_loss = 0
+        dev_corrects = 0
         with tqdm(
             train_loader, desc=f"Epoch {epoch+1}", unit="batch"
         ) as tepoch:
@@ -76,22 +78,27 @@ def main(cfg: DictConfig):
                 optim.step()
 
                 preds = out.argmax(dim=1, keepdim=True).squeeze()
-                accuracy = (preds == labels).sum().item() / cfg.batch_size
+                correct = (preds == labels).sum().item()
+                accuracy = correct / cfg.batch_size
+
+                train_loss += loss.item() * inputs.size(0)
+                train_corrects += correct
                 tepoch.set_postfix(
                     train_loss=loss.item(), train_accuracy=100.0 * accuracy
                 )
             model.eval()
-            running_loss = 0
-            running_correct_preds = 0
             for (inputs, input_lengths), labels in dev_loader:
                 out = model(inputs, input_lengths)
-                running_loss += criterion(out, labels).item()
+                loss = criterion(out, labels)
+                dev_loss += loss.item() * inputs.size(0)
                 preds = out.argmax(dim=1, keepdim=True).squeeze()
-                running_correct_preds += (preds == labels).sum().item()
+                dev_corrects += (preds == labels).sum().item()
             logger.info(
-                "dev_loss={} dev_accuracy={}".format(
-                    running_loss / len(dev_loader),
-                    running_correct_preds / len(dev_ds),
+                "train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
+                    train_loss / len(train_loader.dataset),
+                    train_corrects / len(train_loader.dataset),
+                    dev_loss / len(dev_loader.dataset),
+                    dev_corrects / len(dev_loader.dataset),
                 )
             )
 
