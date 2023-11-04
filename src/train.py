@@ -1,7 +1,7 @@
 import gensim.downloader
 import torch
-from torch.utils.data import DataLoader
 import torch.nn as nn
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from dataset import TRECDataset
@@ -26,7 +26,7 @@ def main():
         test_ds, batch_size=32, shuffle=True, collate_fn=PadSequence()
     )
 
-    model = BiLSTM(w2v.vectors, n_classes=5)
+    model = BiLSTM(torch.from_numpy(w2v.vectors), n_classes=6)
 
     criterion = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=1e4)
@@ -35,13 +35,12 @@ def main():
 
     for epoch in range(epochs):
         print(f"Epoch {epoch}")
-        for inputs, labels in tqdm(train_loader):
+        for (inputs, input_lengths), labels in tqdm(train_loader):
             optim.zero_grad()
-            out = model(inputs)
+            out = model(inputs, input_lengths)
             loss = criterion(out, labels)
             loss.backward()
             optim.step()
-
 
 
 if __name__ == "__main__":

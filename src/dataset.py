@@ -2,6 +2,7 @@ import logging
 
 import gensim.downloader
 import numpy as np
+import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
@@ -21,8 +22,7 @@ class TRECDataset(Dataset):
                     text_tokens.append(w2v.key_to_index[word])
                 except KeyError:
                     pass
-            self.tokens.append(text_tokens)
-            self.max_len = max(self.max_len, len(text_tokens))
+            self.tokens.append(torch.LongTensor(text_tokens))
 
     def __len__(self):
         return len(self.tokens)
