@@ -23,7 +23,9 @@ class BiLSTM(nn.Module):
             bidirectional=True,
             batch_first=True,
         )
-        self.fc = nn.Linear(2 * self.n_hidden, n_classes)
+        self.fc_1 = nn.Linear(2 * self.n_hidden, n_hidden)
+        self.relu = nn.ReLU()
+        self.fc_2 = nn.Linear(n_hidden, n_classes)
 
     def last_timestep(self, unpacked, lengths):
         # Index of the last output for each sequence.
@@ -46,5 +48,7 @@ class BiLSTM(nn.Module):
             out_pack, batch_first=True
         )
         out = self.last_timestep(out_unpack, out_lengths)
-        out = self.fc(out)
+        out = self.fc_1(out)
+        out = self.relu(out)
+        out = self.fc_2(out)
         return out
