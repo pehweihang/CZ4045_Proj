@@ -105,9 +105,9 @@ def main(cfg: DictConfig):
             logger.info(
                 "train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
                     train_loss / len(train_loader.dataset),
-                    train_corrects / len(train_loader.dataset),
+                    train_corrects / len(train_loader.dataset) * 100,
                     dev_loss / len(dev_loader.dataset),
-                    dev_corrects / len(dev_loader.dataset),
+                    dev_corrects / len(dev_loader.dataset) * 100,
                 )
             )
             if dev_loss / len(dev_loader.dataset) < best_dev_loss:
