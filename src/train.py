@@ -3,6 +3,7 @@ import os
 
 import gensim.downloader
 import hydra
+import numpy as np
 import torch
 import torch.nn as nn
 from omegaconf import DictConfig
@@ -52,7 +53,10 @@ def main(cfg: DictConfig):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model = BiLSTM(torch.from_numpy(w2v.vectors), **cfg.model).to(device)
+    embedding = np.array(w2v.vectors)
+    model = BiLSTM(embedding.shape[0], embedding.shape[1], **cfg.model)
+    model.set_embedding(torch.from_numpy(embedding))
+    model.to(device)
 
     criterion = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)

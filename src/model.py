@@ -5,18 +5,24 @@ import torch.nn as nn
 class BiLSTM(nn.Module):
     def __init__(
         self,
-        embeddings,
+        n_embeddings,
+        embedding_dim,
         n_classes,
         n_layers=1,
         n_hidden=50,
         dropout=0,
     ) -> None:
         super().__init__()
-        self.embeddings = nn.Embedding.from_pretrained(embeddings, freeze=True)
+        self.n_embeddings = n_embeddings
+        self.embedding_dim = embedding_dim
+        self.n_classes = n_classes
         self.n_layers = n_layers
         self.n_hidden = n_hidden
+        self.dropout = dropout
+
+        self.embedding = nn.Embedding(n_embeddings, embedding_dim)
         self.lstm = nn.LSTM(
-            self.embeddings.weight.shape[1],
+            self.embedding.weight.shape[1],
             hidden_size=n_hidden,
             num_layers=n_layers,
             dropout=dropout,
@@ -26,6 +32,9 @@ class BiLSTM(nn.Module):
         self.fc_1 = nn.Linear(2 * self.n_hidden, n_hidden)
         self.relu = nn.ReLU()
         self.fc_2 = nn.Linear(n_hidden, n_classes)
+
+    def set_embedding(self, embeddings, freeze=True):
+        self.embedding = nn.Embedding.from_pretrained(embeddings, freeze=True)
 
     def last_timestep(self, unpacked, lengths):
         # Index of the last output for each sequence.
@@ -38,7 +47,7 @@ class BiLSTM(nn.Module):
         return unpacked.gather(1, idx).squeeze()
 
     def forward(self, x, x_lengths):
-        embeddings = self.embeddings(x)
+        embeddings = self.embedding(x)
         x_pack = nn.utils.rnn.pack_padded_sequence(
             embeddings, x_lengths, batch_first=True
         )
