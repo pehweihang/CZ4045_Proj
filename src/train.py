@@ -111,6 +111,7 @@ def main(cfg: DictConfig):
                 )
             )
             if dev_loss / len(dev_loader.dataset) < best_dev_loss:
+                logger.info("Saving best model..")
                 torch.save(
                     {
                         "state_dict": model.state_dict(),
