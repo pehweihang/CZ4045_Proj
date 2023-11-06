@@ -16,7 +16,7 @@ from pad_sequence import PadSequence
 logger = logging.getLogger(__name__)
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="config", config_name="config", version_base="1.2")
 def main(cfg: DictConfig):
     w2v = gensim.downloader.load("word2vec-google-news-300")
     cwd = hydra.utils.get_original_cwd()
