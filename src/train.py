@@ -31,12 +31,6 @@ def main(cfg: DictConfig):
         os.path.join(cwd, cfg.data.dev_labels),
         w2v,
     )
-    test_ds = TRECDataset(
-        os.path.join(cwd, cfg.data.test_data),
-        os.path.join(cwd, cfg.data.test_labels),
-        w2v,
-    )
-    torch.manual_seed(420)
 
     train_loader = DataLoader(
         train_ds,
@@ -50,6 +44,8 @@ def main(cfg: DictConfig):
         shuffle=False,
         collate_fn=PadSequence(),
     )
+
+    torch.manual_seed(420)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
