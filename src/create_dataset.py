@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 from datasets import DatasetDict, load_dataset
+from sklearn.model_selection import train_test_split
 
 
 def parse_args():
@@ -31,11 +32,9 @@ def main(args):
     y_test[y_test == 6] = 0
 
     # random split
-    np.random.seed(420)
-    indices = np.random.permutation(len(x))
-    train_idx, dev_idx = indices[0:-500], indices[-500:]
-    x_train, x_dev = x[train_idx], x[dev_idx]
-    y_train, y_dev = y[train_idx], y[dev_idx]
+    x_train, x_dev, y_train, y_dev = train_test_split(
+        x, y, test_size=500, stratify=y
+    )
 
     np.save(os.path.join(args.data_dir, "x_train"), x_train)
     np.save(os.path.join(args.data_dir, "x_dev"), x_dev)
