@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 
 import gensim.downloader
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 @hydra.main(config_path="config", config_name="config", version_base="1.2")
 def main(cfg: DictConfig):
+    print(os.getcwd())
     w2v = gensim.downloader.load("word2vec-google-news-300")
     cwd = hydra.utils.get_original_cwd()
     train_ds = TRECDataset(
@@ -57,6 +59,7 @@ def main(cfg: DictConfig):
     criterion = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
+    best_dev_loss = math.inf
     for epoch in range(cfg.epochs):
         model.train()
         train_loss = 0
@@ -107,6 +110,21 @@ def main(cfg: DictConfig):
                     dev_corrects / len(dev_loader.dataset),
                 )
             )
+            if dev_loss / len(dev_loader.dataset) < best_dev_loss:
+                torch.save(
+                    {
+                        "state_dict": model.state_dict(),
+                        "model_params": {
+                            "n_embeddings": model.n_embeddings,
+                            "embedding_dim": model.embedding_dim,
+                            "n_classes": model.n_classes,
+                            "n_layers": model.n_layers,
+                            "n_hidden": model.n_hidden,
+                            "dropout": model.dropout,
+                        },
+                    },
+                    os.path.join(os.getcwd(), "best_model.pt"),
+                )
 
 
 if __name__ == "__main__":
