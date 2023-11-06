@@ -50,7 +50,9 @@ def main(cfg: DictConfig):
         collate_fn=PadSequence(),
     )
 
-    model = BiLSTM(torch.from_numpy(w2v.vectors), **cfg.model)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    model = BiLSTM(torch.from_numpy(w2v.vectors), **cfg.model).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)
@@ -65,6 +67,11 @@ def main(cfg: DictConfig):
             train_loader, desc=f"Epoch {epoch+1}", unit="batch"
         ) as tepoch:
             for (inputs, input_lengths), labels in tepoch:
+                inputs, input_lengths, labels = (
+                    inputs.to(device),
+                    input_lengths.to(device),
+                    labels.to(device),
+                )
                 optim.zero_grad()
                 out = model(inputs, input_lengths)
                 loss = criterion(out, labels)
@@ -82,6 +89,11 @@ def main(cfg: DictConfig):
                 )
             model.eval()
             for (inputs, input_lengths), labels in dev_loader:
+                inputs, input_lengths, labels = (
+                    inputs.to(device),
+                    input_lengths.to(device),
+                    labels.to(device),
+                )
                 out = model(inputs, input_lengths)
                 loss = criterion(out, labels)
                 dev_loss += loss.item() * inputs.size(0)
