@@ -49,12 +49,6 @@ def main(cfg: DictConfig):
         shuffle=False,
         collate_fn=PadSequence(),
     )
-    test_loader = DataLoader(
-        test_ds,
-        batch_size=cfg.batch_size,
-        shuffle=False,
-        collate_fn=PadSequence(),
-    )
 
     model = BiLSTM(torch.from_numpy(w2v.vectors), **cfg.model)
 
