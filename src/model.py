@@ -39,7 +39,7 @@ class BiLSTM(nn.Module):
     def last_timestep(self, unpacked, lengths):
         # Index of the last output for each sequence.
         idx = (
-            (lengths - 1)
+            (lengths - 1).to(lengths.get_device())
             .view(-1, 1)
             .expand(unpacked.size(0), unpacked.size(2))
             .unsqueeze(1)
