@@ -27,9 +27,13 @@ def main(args):
     x_test = np.array(dataset["test"]["text"], dtype=object)
     y_test = np.array(dataset["test"]["coarse_label"], dtype=np.int8)
 
-    # combine 0 class with 6 class
-    y[y == 6] = 0
-    y_test[y_test == 6] = 0
+    # combine 0 class with 4 class
+    y[y == 4] = 0
+    y_test[y_test == 4] = 0
+    # set 5 class and 4
+    y[y == 5] = 4
+    y_test[y_test == 5] = 4
+
 
     # random split
     x_train, x_dev, y_train, y_dev = train_test_split(
