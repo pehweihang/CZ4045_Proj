@@ -59,7 +59,7 @@ def main(cfg: DictConfig):
     criterion = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
-    best_dev_loss = math.inf
+    best_dev_acc = 0
     for epoch in range(cfg.epochs):
         model.train()
         train_loss = 0
@@ -110,7 +110,7 @@ def main(cfg: DictConfig):
                     dev_corrects / len(dev_loader.dataset) * 100,
                 )
             )
-            if dev_loss / len(dev_loader.dataset) < best_dev_loss:
+            if best_dev_acc / dev_corrects / len(dev_loader.dataset):
                 logger.info("Saving best model..")
                 torch.save(
                     {
@@ -126,6 +126,7 @@ def main(cfg: DictConfig):
                     },
                     os.path.join(os.getcwd(), "best_model.pt"),
                 )
+                best_dev_acc = dev_corrects / len(dev_loader)
 
 
 if __name__ == "__main__":
