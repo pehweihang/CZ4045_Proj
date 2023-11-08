@@ -39,7 +39,12 @@ class BiLSTM(nn.Module):
     def last_timestep(self, unpacked, lengths):
         # Index of the last output for each sequence.
         idx = (
-            (lengths - 1).to(lengths.get_device())
+            (lengths - 1)
+            .to(
+                f"cuda{unpacked.get_device()}"
+                if unpacked.get_device() != -1
+                else "cpu"
+            )
             .view(-1, 1)
             .expand(unpacked.size(0), unpacked.size(2))
             .unsqueeze(1)
