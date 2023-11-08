@@ -110,7 +110,7 @@ def main(cfg: DictConfig):
                     dev_corrects / len(dev_loader.dataset) * 100,
                 )
             )
-            if best_dev_acc / dev_corrects / len(dev_loader.dataset):
+            if dev_corrects / len(dev_loader.dataset) > best_dev_acc:
                 logger.info("Saving best model..")
                 torch.save(
                     {
@@ -126,7 +126,7 @@ def main(cfg: DictConfig):
                     },
                     os.path.join(os.getcwd(), "best_model.pt"),
                 )
-                best_dev_acc = dev_corrects / len(dev_loader)
+                best_dev_acc = dev_corrects / len(dev_loader.dataset)
 
 
 if __name__ == "__main__":
