@@ -60,6 +60,7 @@ def main(cfg: DictConfig):
     optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
     best_dev_acc = 0
+    best_dev_acc_epoch = 0
     for epoch in range(cfg.epochs):
         model.train()
         train_loss = 0
@@ -90,43 +91,46 @@ def main(cfg: DictConfig):
                 tepoch.set_postfix(
                     train_loss=loss.item(), train_accuracy=100.0 * accuracy
                 )
-            model.eval()
-            for (inputs, input_lengths), labels in dev_loader:
-                inputs, input_lengths, labels = (
-                    inputs.to(device),
-                    input_lengths.to(device),
-                    labels.to(device),
-                )
-                out = model(inputs, input_lengths)
-                loss = criterion(out, labels)
-                dev_loss += loss.item() * inputs.size(0)
-                preds = out.argmax(dim=1, keepdim=True).squeeze()
-                dev_corrects += (preds == labels).sum().item()
-            logger.info(
-                "train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
-                    train_loss / len(train_loader.dataset),
-                    train_corrects / len(train_loader.dataset) * 100,
-                    dev_loss / len(dev_loader.dataset),
-                    dev_corrects / len(dev_loader.dataset) * 100,
-                )
+        model.eval()
+        for (inputs, input_lengths), labels in dev_loader:
+            inputs, input_lengths, labels = (
+                inputs.to(device),
+                input_lengths.to(device),
+                labels.to(device),
             )
-            if dev_corrects / len(dev_loader.dataset) > best_dev_acc:
-                logger.info("Saving best model..")
-                torch.save(
-                    {
-                        "state_dict": model.state_dict(),
-                        "model_params": {
-                            "n_embeddings": model.n_embeddings,
-                            "embedding_dim": model.embedding_dim,
-                            "n_classes": model.n_classes,
-                            "n_layers": model.n_layers,
-                            "n_hidden": model.n_hidden,
-                            "dropout": model.dropout,
-                        },
+            out = model(inputs, input_lengths)
+            loss = criterion(out, labels)
+            dev_loss += loss.item() * inputs.size(0)
+            preds = out.argmax(dim=1, keepdim=True).squeeze()
+            dev_corrects += (preds == labels).sum().item()
+        logger.info(
+            "train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
+                train_loss / len(train_loader.dataset),
+                train_corrects / len(train_loader.dataset) * 100,
+                dev_loss / len(dev_loader.dataset),
+                dev_corrects / len(dev_loader.dataset) * 100,
+            )
+        )
+        if dev_corrects / len(dev_loader.dataset) > best_dev_acc:
+            logger.info("Saving best model..")
+            torch.save(
+                {
+                    "state_dict": model.state_dict(),
+                    "model_params": {
+                        "n_embeddings": model.n_embeddings,
+                        "embedding_dim": model.embedding_dim,
+                        "n_classes": model.n_classes,
+                        "n_layers": model.n_layers,
+                        "n_hidden": model.n_hidden,
+                        "dropout": model.dropout,
                     },
-                    os.path.join(os.getcwd(), "best_model.pt"),
-                )
-                best_dev_acc = dev_corrects / len(dev_loader.dataset)
+                },
+                os.path.join(os.getcwd(), "best_model.pt"),
+            )
+            best_dev_acc = dev_corrects / len(dev_loader.dataset)
+            best_dev_acc_epoch = epoch
+        if epoch - best_dev_acc_epoch > cfg.early_stop_patience:
+            break
 
 
 if __name__ == "__main__":
