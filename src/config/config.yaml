@@ -2,12 +2,12 @@ epochs: 100
 batch_size: 32
 lr: 1e-4
 data:
-  train_data: '../data/x_train.npy'
-  train_labels: '../data/y_train.npy'
-  dev_data: '../data/x_dev.npy'
-  dev_labels: '../data/y_dev.npy'
-  test_data: '../data/x_test.npy'
-  test_labels: '../data/y_test.npy'
+  train_data: './data/x_train.npy'
+  train_labels: './data/y_train.npy'
+  dev_data: './data/x_dev.npy'
+  dev_labels: './data/y_dev.npy'
+  test_data: './data/x_test.npy'
+  test_labels: './data/y_test.npy'
 model:
   n_layers: 1
   n_hidden: 20

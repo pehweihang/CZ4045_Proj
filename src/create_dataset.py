@@ -11,7 +11,7 @@ def parse_args():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="../data/",
+        default="./data/",
         required=False,
         help="directory to save data files to",
     )
