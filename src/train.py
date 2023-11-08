@@ -105,7 +105,8 @@ def main(cfg: DictConfig):
             preds = out.argmax(dim=1, keepdim=True).squeeze()
             dev_corrects += (preds == labels).sum().item()
         logger.info(
-            "train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
+            "Epoch {} train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
+                epoch+1,
                 train_loss / len(train_loader.dataset),
                 train_corrects / len(train_loader.dataset) * 100,
                 dev_loss / len(dev_loader.dataset),
