@@ -50,6 +50,7 @@ def main(cfg: DictConfig):
     torch.manual_seed(420)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device {device}")
 
     embedding = np.array(w2v.vectors)
     model = BiLSTM(embedding.shape[0], embedding.shape[1], **cfg.model)
