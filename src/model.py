@@ -41,7 +41,7 @@ class BiLSTM(nn.Module):
         idx = (
             (lengths - 1)
             .to(
-                f"cuda{unpacked.get_device()}"
+                f"cuda:{unpacked.get_device()}"
                 if unpacked.get_device() != -1
                 else "cpu"
             )
