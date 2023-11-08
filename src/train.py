@@ -1,5 +1,5 @@
 import logging
-import math
+import copy
 import os
 
 import gensim.downloader
@@ -62,6 +62,7 @@ def main(cfg: DictConfig):
 
     best_dev_acc = 0
     best_dev_acc_epoch = 0
+    best_model_state_dict = None
     for epoch in range(cfg.epochs):
         model.train()
         train_loss = 0
@@ -106,7 +107,7 @@ def main(cfg: DictConfig):
             dev_corrects += (preds == labels).sum().item()
         logger.info(
             "Epoch {} train_loss: {:.5f} train_acc: {:.5f} dev_loss: {:.5f} dev_accuracy: {:.5f}".format(
-                epoch+1,
+                epoch + 1,
                 train_loss / len(train_loader.dataset),
                 train_corrects / len(train_loader.dataset) * 100,
                 dev_loss / len(dev_loader.dataset),
@@ -114,25 +115,29 @@ def main(cfg: DictConfig):
             )
         )
         if dev_corrects / len(dev_loader.dataset) > best_dev_acc:
-            logger.info("Saving best model..")
-            torch.save(
-                {
-                    "state_dict": model.state_dict(),
-                    "model_params": {
-                        "n_embeddings": model.n_embeddings,
-                        "embedding_dim": model.embedding_dim,
-                        "n_classes": model.n_classes,
-                        "n_layers": model.n_layers,
-                        "n_hidden": model.n_hidden,
-                        "dropout": model.dropout,
-                    },
-                },
-                os.path.join(os.getcwd(), "best_model.pt"),
-            )
+            best_model_state_dict = copy.deepcopy(model.state_dict())
             best_dev_acc = dev_corrects / len(dev_loader.dataset)
             best_dev_acc_epoch = epoch
         if epoch - best_dev_acc_epoch > cfg.early_stop_patience:
             break
+
+    logger.info(
+        f"Saving best model at epoch {best_dev_acc_epoch+1} with accuracy {best_dev_acc*100:.5f}"
+    )
+    torch.save(
+        {
+            "state_dict": best_model_state_dict,
+            "model_params": {
+                "n_embeddings": model.n_embeddings,
+                "embedding_dim": model.embedding_dim,
+                "n_classes": model.n_classes,
+                "n_layers": model.n_layers,
+                "n_hidden": model.n_hidden,
+                "dropout": model.dropout,
+            },
+        },
+        os.path.join(os.getcwd(), "best_model.pt"),
+    )
 
 
 if __name__ == "__main__":
