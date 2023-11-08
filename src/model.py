@@ -44,7 +44,7 @@ class BiLSTM(nn.Module):
             .expand(unpacked.size(0), unpacked.size(2))
             .unsqueeze(1)
         )
-        return unpacked.gather(1, idx).squeeze(0)
+        return unpacked.gather(1, idx).squeeze(1)
 
     def forward(self, x, x_lengths):
         embeddings = self.embedding(x)
