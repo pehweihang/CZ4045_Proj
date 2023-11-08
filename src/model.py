@@ -49,7 +49,7 @@ class BiLSTM(nn.Module):
     def forward(self, x, x_lengths):
         embeddings = self.embedding(x)
         x_pack = nn.utils.rnn.pack_padded_sequence(
-            embeddings, x_lengths, batch_first=True
+            embeddings, x_lengths.cpu(), batch_first=True
         )
 
         out_pack, _ = self.lstm(x_pack)
