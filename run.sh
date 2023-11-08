@@ -13,7 +13,7 @@
 
 module load anaconda
 source activate nlp-proj
-python train.py -m \
+python src/train.py -m \
   epochs=500 \
   batch_size=1,4,8,16,32,64 \
   lr=0.001,0.0001,0.00001 \
