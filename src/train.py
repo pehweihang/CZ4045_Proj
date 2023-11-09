@@ -1,5 +1,5 @@
-import logging
 import copy
+import logging
 import os
 
 import gensim.downloader
@@ -58,7 +58,9 @@ def main(cfg: DictConfig):
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optim = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    optim = torch.optim.Adam(
+        model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay
+    )
 
     best_dev_acc = 0
     best_dev_acc_epoch = 0

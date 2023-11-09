@@ -1,6 +1,7 @@
 epochs: 100
 batch_size: 32
 lr: 1e-4
+weight_decay: 0
 early_stop_patience: 10
 data:
   train_data: './data/x_train.npy'
