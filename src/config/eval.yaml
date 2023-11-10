@@ -1,0 +1,5 @@
+data:
+  test_data: ./data/x_test.npy
+  test_labels: ./data/y_test.npy
+model_path: ???
+batch_size: 32
