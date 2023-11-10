@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from dataset import TRECDataset
-from model import BiLSTM
+from model import LSTM
 from pad_sequence import PadSequence
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def main(cfg: DictConfig):
     logger.info(f"Using device {device}")
 
     embedding = np.array(w2v.vectors)
-    model = BiLSTM(embedding.shape[0], embedding.shape[1], **cfg.model)
+    model = LSTM(embedding.shape[0], embedding.shape[1], **cfg.model)
     model.set_embedding(torch.from_numpy(embedding))
     model.to(device)
 

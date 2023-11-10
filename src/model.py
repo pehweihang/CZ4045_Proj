@@ -1,8 +1,7 @@
-import torch
 import torch.nn as nn
 
 
-class BiLSTM(nn.Module):
+class LSTM(nn.Module):
     def __init__(
         self,
         n_embeddings,
@@ -11,6 +10,7 @@ class BiLSTM(nn.Module):
         n_layers=1,
         n_hidden=50,
         dropout=0,
+        bidirectional=True
     ) -> None:
         super().__init__()
         self.n_embeddings = n_embeddings
@@ -19,6 +19,7 @@ class BiLSTM(nn.Module):
         self.n_layers = n_layers
         self.n_hidden = n_hidden
         self.dropout = dropout
+        self.bidirectional = bidirectional
 
         self.embedding = nn.Embedding(n_embeddings, embedding_dim)
         self.lstm = nn.LSTM(
@@ -26,10 +27,11 @@ class BiLSTM(nn.Module):
             hidden_size=n_hidden,
             num_layers=n_layers,
             dropout=dropout,
-            bidirectional=True,
             batch_first=True,
+            bidirectional=bidirectional,
         )
-        self.fc_1 = nn.Linear(2 * self.n_hidden, n_hidden)
+        directions = 2 if self.bidirectional else 1
+        self.fc_1 = nn.Linear(directions * self.n_hidden, n_hidden)
         self.relu = nn.ReLU()
         self.fc_2 = nn.Linear(n_hidden, n_classes)
 
