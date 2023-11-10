@@ -117,7 +117,9 @@ def main(cfg: DictConfig):
             )
         )
         if dev_corrects / len(dev_loader.dataset) > best_dev_acc:
-            best_model_state_dict = copy.deepcopy(model.state_dict())
+            best_model_state_dict = {
+                k: v.cpu() for k, v in model.state_dict().items()
+            }
             best_dev_acc = dev_corrects / len(dev_loader.dataset)
             best_dev_acc_epoch = epoch
         if epoch - best_dev_acc_epoch > cfg.early_stop_patience:
