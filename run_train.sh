@@ -13,10 +13,4 @@
 
 module load anaconda
 source activate nlp-proj
-python src/train.py -m \
-  epochs=500 \
-  batch_size=1,64 \
-  lr=0.0001,0.00001 \
-  model.n_layers=5,10 \
-  model.n_hidden=5,10 \
-  model.dropout=0,0.2
+python src/train.py -m

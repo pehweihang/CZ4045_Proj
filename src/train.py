@@ -140,6 +140,7 @@ def main(cfg: DictConfig):
         },
         os.path.join(os.getcwd(), "best_model.pt"),
     )
+    return best_dev_acc
 
 
 if __name__ == "__main__":
