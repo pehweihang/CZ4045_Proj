@@ -35,9 +35,9 @@ hydra:
     params:
       batch_size: choice(2, 4, 8, 16, 32, 64, 128)
       lr: tag(log, interval(0.00001, 0.1))
-      model.n_layers: range(1, 20, step=1)
-      model.n_hidden: range(1, 20, step=1)
-      model.dropout: range(0.1, 0.3, step=0.01)
+      model.n_layers: range(1, 10, step=1)
+      model.n_hidden: range(1, 10, step=1)
+      model.dropout: range(0, 0.3, step=0.01)
 
 # if true, simulate a failure by raising an exception
 error: false
